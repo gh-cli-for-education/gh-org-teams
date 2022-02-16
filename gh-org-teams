@@ -7,7 +7,7 @@ then
   ORG=$1
 fi
 
-echo $ORG
+#echo $ORG
 QUERY='query($organization: String!) {
   organization(login: $organization) {
     teams(first: 100) {
@@ -15,6 +15,16 @@ QUERY='query($organization: String!) {
       edges {
         node {
           name
+          members(first: 100) {
+            totalCount
+            edges {
+              memberAccessUrl
+              node {
+                name
+                email
+              }
+            }
+          }
           url
         }
       }
