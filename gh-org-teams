@@ -1,14 +1,36 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
+function help() {
+  echo "Usage:"
+  echo "  $0 [-o|--ORG <ORG>]"
+  echo
+  echo "For a better experience:"
+  echo "  set alias pwd to:  !gh config get current-org"
+  echo "  set alias cd to:   !gh config set current-org "$1" 2>/dev/null"
+  exit 1
+}
 
-ORG=$(gh pwd)
-if [ -n "$1" ]
-then
-  ORG=$1
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  -o | --ORG)
+    ORG=$2
+    shift # past argument
+    shift # past value
+    ;;
+
+  -* | --*)
+    help
+    ;;
+  *)
+    help
+    shift # past argument
+    ;;
+  esac
+done
+
+if [ -z "$ORG" ]; then
+  ORG=$(gh pwd) || help
 fi
-
-#echo $ORG
-QUERY='query($organization: String!) {
+QUERY='query getInfo($organization: String!) {
   organization(login: $organization) {
     teams(first: 100) {
       totalCount
@@ -21,7 +43,9 @@ QUERY='query($organization: String!) {
               memberAccessUrl
               node {
                 name
+                url
                 email
+                login               
               }
             }
           }
@@ -30,38 +54,9 @@ QUERY='query($organization: String!) {
       }
     }
   }
-}  
-'
-gh api graphql -q '.data.organization.teams.edges[].node' -F organization="$ORG" -f query="$QUERY" | jq .
+}'
 
+export ORG
+TEAMS=$(gh api graphql -F organization="$ORG" -f query="$QUERY")
 
-# Snippets to help get started:
-
-# Determine if an executable is in the PATH
-# if ! type -p ruby >/dev/null; then
-#   echo "Ruby not found on the system" >&2
-#   exit 1
-# fi
-
-# Pass arguments through to another command
-# gh issue list "$@" -R cli/cli
-
-# Using the gh api command to retrieve and format information
-# QUERY='
-#   query($endCursor: String) {
-#     viewer {
-#       repositories(first: 100, after: $endCursor) {
-#         nodes {
-#           nameWithOwner
-#           stargazerCount
-#         }
-#       }
-#     }
-#   }
-# '
-# TEMPLATE='
-#   {{- range $repo := .data.viewer.repositories.nodes -}}
-#     {{- printf "name: %s - stargazers: %v\n" $repo.nameWithOwner $repo.stargazerCount -}}
-#   {{- end -}}
-# '
-# exec gh api graphql -f query="${QUERY}" --paginate --template="${TEMPLATE}"
+echo $TEAMS
