@@ -1,4 +1,4 @@
-# gh extension
+# gh extension org-teams
 
 to install the extension, run:
 
