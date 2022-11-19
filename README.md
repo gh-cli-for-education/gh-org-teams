@@ -1,6 +1,6 @@
 # gh extension org-teams
 
-to install the extension, run:
+To install the extension, run:
 
 ```bash
 gh extension install gh-cli-for-education/gh-org-teams
