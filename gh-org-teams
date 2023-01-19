@@ -3,9 +3,10 @@ function help() {
   echo "Usage:"
   echo "  gh org-teams [-o|--ORG <ORG>] [-n|--NAME] [-u|--URL]"
   echo
-  echo "For a better experience set these alias:"
-  echo "  set alias pwd to:  !gh config get current-org"
-  echo "  set alias cd to:   !gh config set current-org "$1" 2>/dev/null"
+  echo "By default the ORG is obtained using the command gh pwd."
+  echo "  For a better experience set these alias:"
+  echo "    set alias pwd to:  !gh config get current-org"
+  echo "    set alias cd to:   !gh config set current-org "$1" 2>/dev/null"
   exit 1
 }
 
