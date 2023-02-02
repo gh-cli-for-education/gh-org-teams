@@ -47,7 +47,8 @@ QUERY='query getInfo($organization: String!) {
                 name
                 url
                 email
-                login               
+                login
+                avatarUrl             
               }
             }
           }
