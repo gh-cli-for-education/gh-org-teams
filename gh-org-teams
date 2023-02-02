@@ -1,7 +1,7 @@
 #!/bin/bash
 function help() {
   echo "Usage:"
-  echo "  $0 [-o|--ORG <ORG>]"
+  echo "  gh org-teams [-o|--ORG <ORG>] [-n|--NAME] [-u|--URL]"
   echo
   echo "By default the ORG is obtained using the command gh pwd."
   echo "  For a better experience set these alias:"
@@ -18,6 +18,20 @@ while [[ $# -gt 0 ]]; do
     shift # past argument
     shift # past value
     ;;
+  -n | --NAME)
+    NAME=true
+    shift # past value
+    ;;
+  -u | --URL)
+    URL=true
+    shift # past value
+    ;;
+ -nu | --NAME-URL)
+    NAME=true
+    URL=true
+    shift # past value
+    ;;
+
 
   -* | --*)
     help
@@ -60,5 +74,19 @@ QUERY='query getInfo($organization: String!) {
 }'
 
 TEAMS=$(gh api graphql -F organization="$ORG" -f query="$QUERY")
+
+if [ -n "$NAME" ] && [ -n "$URL" ] 
+then
+  echo $TEAMS |  jq '.data.organization.teams.edges | map({ name:.node.name, url:.node.url})'
+  exit 0
+fi
+if [ -n "$NAME" ]; then
+  echo $TEAMS |  jq '.data.organization.teams.edges | map(.node.name)'
+  exit 0
+fi
+if [ -n "$URL" ]; then
+  echo $TEAMS |  jq '.data.organization.teams.edges | map(.node.url)'
+  exit 0
+fi
 
 echo $TEAMS
